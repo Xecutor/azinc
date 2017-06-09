@@ -1,0 +1,104 @@
+/*html{
+    min-height: 100%;
+    position:relative;
+}*/
+body {
+    margin: 0;
+    padding: 0;
+}
+.root {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+}
+
+.container {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+}
+
+td {
+    text-align: center;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.arrowTd {
+    font-size: 10px;
+}
+
+.letterTd{
+    border-width: 1px;
+    border-style: solid;
+    border-color: red;
+    border-radius: 10px;
+    width: 120px;
+    height: 120px;
+}
+
+.letterDiv {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 34px;
+}
+
+.letterDivInf {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-weight: bold;
+    font-size: 48px;
+}
+
+.countDiv {
+    font-family: Tahoma;
+    font-size: 12px;
+}
+
+.letterBoxDiv {
+    width: 100%;
+    height: 100%;
+    cursor: default;
+}
+
+.upgradeButton {
+    font-size: 22px;
+    display: inline-block;
+    border: 1px solid lightblue;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.centerDiv{
+    align-content: center;
+    text-align: center;
+}
+
+.pauseButton {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.optionsButton {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 32px;
+    margin-right: 10px;
+    margin-top: 10px;
+    border: 1px solid grey;
+    border-radius: 3px;
+    cursor: pointer;
+    width:40px;
+    text-align: center;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

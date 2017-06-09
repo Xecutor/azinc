@@ -1,0 +1,32 @@
+{
+  "name": "azinc",
+  "version": "1.0.0",
+  "description": "A-Z incremental",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc && concurrently \"tsc -w\" \"lite-server\" ",
+    "build": "webpack"
+  },
+  "keywords": [
+    "incremental",
+    "browser",
+    "game"
+  ],
+  "author": "Konstantin 'Xecutor' Stupnik",
+  "license": "ISC",
+  "dependencies": {
+    "@types/react": "^15.0.23",
+    "@types/react-dom": "^15.5.0",
+    "decimal.js": "^7.2.1",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "react-modal-dialog": "^4.0.7",
+    "react-tooltip": "^3.3.0",
+    "swarm-numberformat": "^0.3.5",
+    "typescript": "^2.3.1"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^3.1.2",
+    "source-map-loader": "^0.2.1"
+  }
+}
