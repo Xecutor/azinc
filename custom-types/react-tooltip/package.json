@@ -1,0 +1,77 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "@types/react-tooltip",
+        "scope": null,
+        "escapedName": "@types%2freact-tooltip",
+        "name": "@types/react-tooltip",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "C:\\Work\\ts\\reacttest"
+    ]
+  ],
+  "author": {
+    "name": "wwayne"
+  },
+  "browserify-shim": {
+    "react": "global:React",
+    "react-dom": "global:ReactDOM"
+  },
+  "bugs": {
+    "url": "https://github.com/wwayne/react-tooltip/issues"
+  },
+  "dependencies": {
+    "classnames": "^2.2.0",
+    "prop-types": "^15.5.8"
+  },
+  "description": "react tooltip component",
+  "directories": {},
+  "engines": {
+    "node": ">=4.2.1"
+  },
+  "gitHead": "6da5af80df1a51be587920421c2efb8aeb78d051",
+  "homepage": "https://github.com/wwayne/react-tooltip",
+  "keywords": [
+    "react",
+    "react-component",
+    "tooltip",
+    "react-tooltip"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "hmnid",
+      "email": "huumanoid@hotmail.com"
+    },
+    {
+      "name": "wwayne",
+      "email": "wayne.wang0821@gmail.com"
+    }
+  ],
+  "name": "@types/react-tooltip",
+  "optionalDependencies": {},
+  "peerDependencies": {
+    "react": "^0.14.0 || ^15.0.0",
+    "react-dom": "^0.14.0 || ^15.0.0"
+  },
+  "readme": "ERROR: No README data found!",
+  "scripts": {
+    "deploy": "make deploy",
+    "start": "make dev",
+    "test": "make test"
+  },
+  "standard": {
+    "parser": "babel-eslint",
+    "ignore": [
+      "dist/",
+      "standalone/",
+      "src/style.js",
+      "src/style.css",
+      "example/"
+    ]
+  },
+  "version": "3.3.0"
+}

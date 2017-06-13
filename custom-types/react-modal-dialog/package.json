@@ -1,0 +1,40 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "@types/react-modal-dialog",
+        "scope": null,
+        "escapedName": "@types%2freact-modal-dialog",
+        "name": "@types/react-modal-dialog",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "C:\\Work\\ts\\reacttest"
+    ]
+  ],
+  "author": {
+    "name": "Qiming Weng"
+  },
+  "bugs": {
+    "url": "https://github.com/qimingweng/react-modal-dialog/issues"
+  },
+  "description": "A simple, idiomatic, and declarative way to launch modal dialogs in ReactJS",
+  "directories": {},
+  "homepage": "https://github.com/qimingweng/react-modal-dialog#readme",
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "qiming",
+      "email": "qim.weng@gmail.com"
+    }
+  ],
+  "name": "@types/react-modal-dialog",
+  "optionalDependencies": {},
+  "peerDependencies": {
+    "react": "^0.14.0 || ^15.0.0",
+    "react-dom": "^0.14.0 || ^15.0.0"
+  },
+  "readme": "ERROR: No README data found!",
+  "version": "4.0.7"
+}
