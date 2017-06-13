@@ -1,0 +1,7 @@
+{
+  "description": "Format very large numbers in several human-readable ways. `format(1e6)` -> `\"1 million\"` or `\"1M\"`",
+  "license": "MIT",
+  "name": "@types/swarm-numberformat",
+  "repository": "",
+  "version": "0.3.5"
+}

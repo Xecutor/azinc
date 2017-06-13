@@ -1,12 +1,17 @@
 import * as React from "react";
 import {ModalDialog, ModalContainer} from 'react-modal-dialog';
 import ReactTooltip = require('react-tooltip');
+import {Options, OptionsComponent} from './Options';
+import {AscensionComponent, Upgrades} from './Ascension'
 
-import { MainGame, LetterRecord } from "./MainGame";
+import { MainGame, LetterRecord, maxLettersCount } from "./MainGame";
 
 interface GameRootState {
     letters:Array< LetterRecord >;
     optionsOpened:boolean;
+    ascension: boolean;
+    options:Options;
+    upgrades: Upgrades;
 }
 
 
@@ -17,10 +22,18 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
     lastUpdate:number;
     lastSave:number;
 
+
     constructor()
     {
         super();
-        this.state={letters:[new LetterRecord], optionsOpened:false};
+        this.state={
+            letters:[new LetterRecord], 
+            optionsOpened:false,
+            ascension:false,
+            options:new Options,
+            upgrades:new Upgrades
+
+        };
         this.timerId=setInterval(()=>this.onTimer(), 1000);
         this.lastUpdate=performance.now();
         this.lastSave=this.lastUpdate;
@@ -30,15 +43,23 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
 
     save()
     {
-        //localStorage.setItem("azincsave", JSON.stringify(this.state));
+        if(localStorage) {
+            let saveData = JSON.stringify(this.state);
+            localStorage.setItem("azincsave", saveData);
+        }
     }
 
     load()
     {
-        let savedData=undefined;//localStorage.getItem("azincsave");
+        let savedData=localStorage && localStorage.getItem("azincsave");
         if(savedData) {
             let parsedData=JSON.parse(savedData);
             if(parsedData) {
+                if(!parsedData.options)parsedData.options=new Options;
+                if(!parsedData.upgrades)parsedData.upgrades=new Upgrades;
+                if(parsedData.letters.length>maxLettersCount) {
+                    parsedData.letters=parsedData.letters.slice(0, maxLettersCount);
+                }
                 this.state=parsedData;
                 this.updateChange(this.state.letters);
             }
@@ -66,7 +87,6 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
             let [cnt2]=this.calcInc(newLetters, i + 1, false);
             newLetters[i].change=cnt*mul-cnt2*10;
         }
-        //console.log(newLetters[6].change);
     }
 
     onTimer()
@@ -110,7 +130,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
             let newLetters=this.state.letters.slice();
             newLetters[idx].count++;
             if(idx > 1)newLetters[idx-1].count-= 10;
-            if(idx == newLetters.length-1 && newLetters[idx].count>=10) {
+            if(idx == newLetters.length-1 && newLetters[idx].count>=10 && newLetters.length<maxLettersCount) {
                 newLetters.push(new LetterRecord);
             }
             this.setState({letters:newLetters});
@@ -163,6 +183,38 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
         this.setState({optionsOpened:false});
     }
 
+    updateOptionsDiv(d:HTMLElement)
+    {
+        if(d) {
+            d.style.color='#000001';
+            setTimeout(function(){
+                d.style.color='#000000';
+            }, 500);
+        }
+    }
+
+    onOptionsUpdate(updatedOptions:Options)
+    {
+        this.setState({options: updatedOptions});
+    }
+
+    onHardReset()
+    {
+        this.setState({optionsOpened:false});
+    }
+
+    onAscendClick()
+    {
+        this.setState({ascension:true});
+    }
+
+    onBuyUpgrade(key:keyof Upgrades)
+    {
+        let newUpgrades={...this.state.upgrades};
+        newUpgrades[key]=true;
+        this.setState({upgrades:newUpgrades});
+    }
+
     render()
     {
         return (
@@ -173,17 +225,33 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
                 this.state.optionsOpened && 
                 <ModalContainer onClose={()=>this.onOptionsClose()}>
                     <ModalDialog onClose={()=>this.onOptionsClose()}>
-                        hello
+                        <div ref={(d)=>this.updateOptionsDiv(d)}>
+                            <OptionsComponent 
+                                options={this.state.options}
+                                onChange={(updatedOptions:Options)=>this.onOptionsUpdate(updatedOptions)}
+                                onHardReset={()=>this.onHardReset()}
+                            />
+                        </div>
                     </ModalDialog>
                 </ModalContainer>
             }
             <div className="container">
-                <MainGame 
-                    letters={this.state.letters}
-                    onLetterClick={(idx)=>this.onLetterClick(idx)}
-                    onUpgradeClick={(idx, max)=>this.onUpgradeClick(idx, max)}
-                    onPauseClick={(idx)=>this.onPauseClick(idx)}
-                />
+                {
+                    this.state.ascension ?
+                    <AscensionComponent 
+                        upgrades={this.state.upgrades}
+                        onBuyUpgrade={(key:keyof Upgrades)=>this.onBuyUpgrade(key)}
+                    />
+                    :
+                    <MainGame 
+                        letters={this.state.letters}
+                        options={this.state.options}
+                        onLetterClick={(idx)=>this.onLetterClick(idx)}
+                        onUpgradeClick={(idx, max)=>this.onUpgradeClick(idx, max)}
+                        onPauseClick={(idx)=>this.onPauseClick(idx)}
+                        onAscendClick={()=>this.onAscendClick()}
+                    />
+                }
             </div>
         </div>
         );

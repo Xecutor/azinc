@@ -1,5 +1,6 @@
 import * as React from "react";
 import {LetterBox} from './LetterBox';
+import {Options} from './Options';
 
 export class LetterRecord{
     count:number = 0;
@@ -11,12 +12,15 @@ export class LetterRecord{
 
 interface MainGameProps { 
     letters : Array<LetterRecord>;
+    options: Options;
     onLetterClick: (idx:number)=>void;
     onUpgradeClick: (idx:number, max:boolean)=>void;
     onPauseClick: (idx:number)=>void;
+    onAscendClick:()=>void;
 }
 
 const lettersSeq = '∞ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+export const maxLettersCount = lettersSeq.length;
 const lettersPos = [
     2,2, // ∞ 0
     3,2, // A 1
@@ -70,7 +74,7 @@ export class MainGame extends React.Component<MainGameProps, undefined> {
         let lc = this.props.letters.length;
         let minx=lettersPos[0],maxx=minx;
         let miny=lettersPos[0],maxy=miny;
-        for(let i=0;i<lettersSeq.length;++i) {
+        for(let i=0;i<lc;++i) {
             let x=lettersPos[i*2+1];
             let y=lettersPos[i*2];
             if(x<minx)minx=x;
@@ -81,6 +85,8 @@ export class MainGame extends React.Component<MainGameProps, undefined> {
 
         let rowsCount = maxy-miny+1;
         let colsCount = maxx-minx+1;
+
+        let allowAscension = lc>=lettersSeq.length && this.props.letters[lc-1].count>=10;
 
         for(let y=0;y<rowsCount;++y) {
             let cols=[];
@@ -95,27 +101,30 @@ export class MainGame extends React.Component<MainGameProps, undefined> {
                             sym={sym}
                             idx={lInfo.idx}
                             letter={this.props.letters[lInfo.idx]} 
+                            options={this.props.options}
+                            ascend={allowAscension}
                             onClick={this.props.onLetterClick}
                             onUpgradeClick={this.props.onUpgradeClick}
                             onPauseClick={this.props.onPauseClick}
+                            onAscendClick={this.props.onAscendClick}
                           />
                       </td>);
                 }
                 else {
-                    cols.push(<td></td>);
+                    cols.push(<td key={x+' '+y}></td>);
                 }
                 if(x!=colsCount-1) {
                     let nxlInfo = lettersArr[miny+y][minx+x+1];
                     if(lInfo && nxlInfo && nxlInfo.idx<lc && lInfo.idx<lc) {
                         if(lInfo.idx+1==nxlInfo.idx) {
-                            cols.push(<td className="arrowTd">▶</td>);
+                            cols.push(<td key={x+' a '+y} className="arrowTd">▶</td>);
                         }
                         else {
-                            cols.push(<td className="arrowTd">◀</td>);
+                            cols.push(<td key={x+' a '+y} className="arrowTd">◀</td>);
                         }
                     }
                     else {
-                        cols.push(<td></td>);
+                        cols.push(<td key={x+' s '+y}></td>);
                     }
                 }
             }
@@ -127,18 +136,18 @@ export class MainGame extends React.Component<MainGameProps, undefined> {
                     let nxlInfo = lettersArr[miny+y+1][minx+x];
                     if(lInfo && nxlInfo && lInfo.idx<lc && nxlInfo.idx<lc) {
                         if(lInfo.idx+1==nxlInfo.idx) {
-                            cols.push(<td className="arrowTd">▼</td>);
+                            cols.push(<td key={x+' b '+y} className="arrowTd">▼</td>);
                         }
                         else {
-                            cols.push(<td className="arrowTd">▲</td>);
+                            cols.push(<td key={x+' b '+y} className="arrowTd">▲</td>);
                         }
                     }
                     else {
-                        cols.push(<td></td>);    
+                        cols.push(<td key={x+' t '+y}></td>);    
                     }
-                    cols.push(<td></td>);
+                    cols.push(<td key={x+' r '+y}></td>);
                 }
-                rows.push(<tr>{cols}</tr>);
+                rows.push(<tr key={'t '+y}>{cols}</tr>);
             }
         }
         return (

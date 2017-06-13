@@ -5,6 +5,8 @@
 body {
     margin: 0;
     padding: 0;
+    background-color: wheat;
+    box-shadow: inset 0px 0px 60px 20px rgba(0,0,0,0.5);
 }
 .root {
     width: 100%;
@@ -36,7 +38,7 @@ td {
 .letterTd{
     border-width: 1px;
     border-style: solid;
-    border-color: red;
+    border-color: rgb(163, 161, 39);
     border-radius: 10px;
     width: 120px;
     height: 120px;
@@ -68,7 +70,7 @@ td {
 .upgradeButton {
     font-size: 22px;
     display: inline-block;
-    border: 1px solid lightblue;
+    border: 1px solid darkblue;
     margin: 5px;
     cursor: pointer;
 }
@@ -92,7 +94,7 @@ td {
     font-size: 32px;
     margin-right: 10px;
     margin-top: 10px;
-    border: 1px solid grey;
+    border: 1px solid black;
     border-radius: 3px;
     cursor: pointer;
     width:40px;
@@ -101,4 +103,14 @@ td {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.hardResetButton {
+    background: red;
+    margin-top: 20px;
+    margin-right: 20px;
+}
+
+.upgradeDescTd {
+    text-align: left;
 }
