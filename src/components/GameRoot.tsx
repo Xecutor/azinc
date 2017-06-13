@@ -212,7 +212,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
     {
         let newUpgrades={...this.state.upgrades};
         newUpgrades[key]=true;
-        this.setState({upgrades:newUpgrades});
+        this.setState({upgrades:newUpgrades, ascension:false, letters:[new LetterRecord]});
     }
 
     render()
