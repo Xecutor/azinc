@@ -22,6 +22,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
     lastUpdate:number;
     lastSave:number;
 
+    tooltip:ReactTooltip;
 
     constructor()
     {
@@ -74,6 +75,12 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
         let cnt = Math.abs((lp.count/10));
         if(!checkOverflow || idx==1 || cnt>l.level)cnt=l.level;
         let mul=letters.length-idx-2;
+        if(mul>15) {
+            mul=10+Math.floor((mul-15)/4);
+        }else if(mul>5) {
+
+            mul=5+Math.floor((mul-5)/2);
+        }
         if(mul < 1) {
             mul=1;
         }
@@ -120,6 +127,22 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
             this.lastSave=now;
         }
     }
+
+    componentDidUpdate(prevProps:any, prevState:GameRootState)
+    {
+        if(this.state.letters.length!=prevState.letters.length) {
+            ReactTooltip.rebuild();        
+        }
+        if(this.tooltip.state.show) {
+            this.tooltip.setState(
+                {
+                    placeholder:this.tooltip.state.currentTarget.getAttribute('data-tip')
+                }
+            );
+        }
+    }
+
+
     onLetterClick(idx:number)
     {
         let prevCount = idx < 2 ? 10 : this.state.letters[idx-1].count;
@@ -136,6 +159,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
             this.setState({letters:newLetters});
         }
     }
+
     onUpgradeClick(idx:number, max:boolean)
     {
         if(idx==this.state.letters.length-1) {
@@ -151,7 +175,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
             if(ucost>newLetters[idx+1].count) {
                 break;
             }
-            if(idx>1 && max && startChange>0 && curChange<10) {
+            if(idx>1 && max && startChange>0 && curChange<=10) {
                 break;
             }
             newLetters[idx].level++;
@@ -198,9 +222,15 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
         this.setState({options: updatedOptions});
     }
 
+    resetState(upgrades:Upgrades)
+    {
+        this.setState({upgrades:upgrades, ascension:false, letters:[new LetterRecord]});
+    }
+
     onHardReset()
     {
         this.setState({optionsOpened:false});
+        this.resetState(new Upgrades);
     }
 
     onAscendClick()
@@ -212,48 +242,56 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
     {
         let newUpgrades={...this.state.upgrades};
         newUpgrades[key]=true;
-        this.setState({upgrades:newUpgrades, ascension:false, letters:[new LetterRecord]});
+        this.resetState(newUpgrades);
+    }
+
+    onGetContent(elem:HTMLElement)
+    {
+        return elem.getAttribute('data-tip') || '';
     }
 
     render()
     {
         return (
-        <div>
-            <ReactTooltip effect={'solid'}/>
-            <div className="optionsButton" onClick={()=>this.onOptionsClick()}>⚙</div>
-            {
-                this.state.optionsOpened && 
-                <ModalContainer onClose={()=>this.onOptionsClose()}>
-                    <ModalDialog onClose={()=>this.onOptionsClose()}>
-                        <div ref={(d)=>this.updateOptionsDiv(d)}>
-                            <OptionsComponent 
-                                options={this.state.options}
-                                onChange={(updatedOptions:Options)=>this.onOptionsUpdate(updatedOptions)}
-                                onHardReset={()=>this.onHardReset()}
-                            />
-                        </div>
-                    </ModalDialog>
-                </ModalContainer>
-            }
-            <div className="container">
+            <div>
+                <div className="optionsButton" onClick={()=>this.onOptionsClick()}>⚙</div>
                 {
-                    this.state.ascension ?
-                    <AscensionComponent 
-                        upgrades={this.state.upgrades}
-                        onBuyUpgrade={(key:keyof Upgrades)=>this.onBuyUpgrade(key)}
-                    />
-                    :
-                    <MainGame 
-                        letters={this.state.letters}
-                        options={this.state.options}
-                        onLetterClick={(idx)=>this.onLetterClick(idx)}
-                        onUpgradeClick={(idx, max)=>this.onUpgradeClick(idx, max)}
-                        onPauseClick={(idx)=>this.onPauseClick(idx)}
-                        onAscendClick={()=>this.onAscendClick()}
-                    />
+                    this.state.optionsOpened && 
+                    <ModalContainer onClose={()=>this.onOptionsClose()}>
+                        <ModalDialog onClose={()=>this.onOptionsClose()}>
+                            <div ref={(d)=>this.updateOptionsDiv(d)}>
+                                <OptionsComponent 
+                                    options={this.state.options}
+                                    onChange={(updatedOptions:Options)=>this.onOptionsUpdate(updatedOptions)}
+                                    onHardReset={()=>this.onHardReset()}
+                                />
+                            </div>
+                        </ModalDialog>
+                    </ModalContainer>
                 }
+                <div className="container">
+                    {
+                        this.state.ascension ?
+                        <AscensionComponent 
+                            upgrades={this.state.upgrades}
+                            onBuyUpgrade={(key:keyof Upgrades)=>this.onBuyUpgrade(key)}
+                        />
+                        :
+                        <MainGame 
+                            letters={this.state.letters}
+                            options={this.state.options}
+                            onLetterClick={(idx)=>this.onLetterClick(idx)}
+                            onUpgradeClick={(idx, max)=>this.onUpgradeClick(idx, max)}
+                            onPauseClick={(idx)=>this.onPauseClick(idx)}
+                            onAscendClick={()=>this.onAscendClick()}
+                        />
+                    }
+                </div>
+                <ReactTooltip
+                    effect={'float'}
+                    ref={(tt)=>this.tooltip=tt}
+                />
             </div>
-        </div>
         );
     }
 }

@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+type StringOrReactText = string | React.ReactText;
+type GetContentFunc = (e:HTMLElement)=>StringOrReactText;
+
 interface ReactTooltipProps {
     place?:'top'|'bottom'|'left'|'right';
     type?:'success'|'warning'|'error'|'info'|'light';
@@ -15,7 +18,7 @@ interface ReactTooltipProps {
     delayShow?:number;
     insecure?:boolean;
     border?:boolean;
-    getContent?:()=>void|[()=>void, number];
+    getContent?:GetContentFunc | Array<number|GetContentFunc>;
     afterShow?:()=>void;
     afterHide?:()=>void;
     disable?:boolean;

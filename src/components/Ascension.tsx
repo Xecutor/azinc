@@ -5,8 +5,9 @@ export class Upgrades{
     adMult=false;
     upgrade1=false;
     upgrade2=false;
-    [index:string]:boolean;
 }
+
+//type DescArr<T, K extends keyof T> = Array<{key:[P in K]}
 
 const upgradesDesc:Array<{key:keyof Upgrades, desc:string}> = [
     {key:'autoGetLast', desc:'Automatically get last letter once available'},
