@@ -2,18 +2,22 @@ import * as React from "react";
 
 export class Upgrades{
     autoGetLast=false;
-    adMult=false;
-    upgrade1=false;
-    upgrade2=false;
+    multAD=false;
+    multFJ=false;
+    multKO=false;
+    multPT=false;
+    multUZ=false;
 }
 
 //type DescArr<T, K extends keyof T> = Array<{key:[P in K]}
 
 const upgradesDesc:Array<{key:keyof Upgrades, desc:string}> = [
     {key:'autoGetLast', desc:'Automatically get last letter once available'},
-    {key:'adMult', desc:'Double conversion rate of letters a-d'},
-    {key:'upgrade1', desc:'Test upgrade 1'},
-    {key:'upgrade2', desc:'Test upgrade 2'},
+    {key:'multAD', desc:'Double conversion rate of letters A-D'},
+    {key:'multFJ', desc:'Double conversion rate of letters F-J'},
+    {key:'multKO', desc:'Double conversion rate of letters L-O'},
+    {key:'multPT', desc:'Double conversion rate of letters P-T'},
+    {key:'multUZ', desc:'Double conversion rate of letters U-Z'},
 ]
 
 
@@ -43,7 +47,6 @@ export class AscensionComponent extends React.Component< AscensionProps, any > {
                     }
                 </tbody>
             </table>
-
         )
     }
 }

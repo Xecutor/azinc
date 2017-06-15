@@ -67,6 +67,10 @@ td {
     cursor: default;
 }
 
+.letterBoxDivPaused {
+    background-color:  #e4d8c4;
+}
+
 .upgradeButton {
     font-size: 22px;
     display: inline-block;
@@ -113,4 +117,11 @@ td {
 
 .upgradeDescTd {
     text-align: left;
+}
+
+.miniButton {
+    font-size: 22px;
+    display: inline-block;
+    margin: 5px;
+    cursor: pointer;
 }

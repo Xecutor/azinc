@@ -4,6 +4,7 @@ import {LetterRecord} from './MainGame';
 import {Options} from './Options';
 import {format} from 'swarm-numberformat';
 import ReactTooltip = require('react-tooltip');
+import {MiniButton} from './MiniButton';
 
 
 interface LetterBoxProps{
@@ -16,12 +17,16 @@ interface LetterBoxProps{
     options:Options;
 
     onClick:(idx:number)=>void;
-    onUpgradeClick:(idx:number, max:boolean)=>void;
+    onUpgradeClick:(idx:number, count:number)=>void;
     onPauseClick:(idx:number)=>void;
     onAscendClick:()=>void;
 }
 
 export class LetterBox extends React.Component<LetterBoxProps, undefined> {
+    onUpgradeClick(e:React.MouseEvent<HTMLElement>)
+    {
+        this.props.onUpgradeClick(this.props.idx, e.altKey? 100 : e.shiftKey?10:1);
+    }
     render()
     {
         if(this.props.idx==0) {
@@ -41,15 +46,28 @@ export class LetterBox extends React.Component<LetterBoxProps, undefined> {
             let change=this.props.letter.change>0?'+'+lc:lc;
             let count=format(this.props.letter.count, {format:fmt, flavor:'short'});
             let countRaw=this.props.letter.count.toString();
+            let addStyle = this.props.letter.paused ? " letterBoxDivPaused" : "";
+                    // <div 
+                    //     className="upgradeButton" 
+                    //     data-tip={"Increment autoconversion level by 1<br>Click with shift pressed to increment by 10<br>Click with alt pressed to increment by 100"} 
+                    //     data-multiline={true}
+                    //     onClick={(e)=>this.onUpgradeClick(e)}
+                    // >⇧</div>
             return (
-                <div className="letterBoxDiv" onClick={()=>this.props.onClick(this.props.idx)}>
+                <div className={"letterBoxDiv"+addStyle} onClick={()=>this.props.onClick(this.props.idx)}>
                     <div className="letterDiv">{this.props.sym}</div>
-                    <div 
-                        className="upgradeButton" 
-                        data-tip={"Upgrade once "+count} 
-                        onClick={()=>this.props.onUpgradeClick(this.props.idx, false)}
-                    >⇧</div>
-                    <div className="upgradeButton" onClick={()=>this.props.onUpgradeClick(this.props.idx, true)}>⇮</div>
+                    <MiniButton onClick={(e)=>this.onUpgradeClick(e)} borderColor="blue">
+                        <span 
+                            data-tip="Increment autoconversion level by 1<br>Click with shift pressed to increment by 10<br>Click with alt pressed to increment by 100"
+                            data-multiline={true}
+                        >
+                            ⇧
+                        </span>
+                    </MiniButton>
+                    <MiniButton
+                        onClick={()=>this.props.onUpgradeClick(this.props.idx, -1)}
+                        borderColor="darkgreen"
+                    >⇮</MiniButton>
                     {this.props.letter.level}
                     <div className="countDiv">
                         <span data-tip={countRaw}>{count}</span>
@@ -59,8 +77,7 @@ export class LetterBox extends React.Component<LetterBoxProps, undefined> {
                         <div 
                             className="pauseButton"
                             data-tip={this.props.letter.paused?'Unpause':'Pause'}
-                            data-event-off='mouseleave click'
-                            data-delay-show="2" 
+                            data-delay-show="2000" 
                             onClick={()=>this.props.onPauseClick(this.props.idx)}
                         >
                             {pauseButtonSym}

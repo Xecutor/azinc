@@ -24,6 +24,8 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
 
     tooltip:ReactTooltip;
 
+    multipliers=new Array<number>(maxLettersCount);
+
     constructor()
     {
         super();
@@ -35,6 +37,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
             upgrades:new Upgrades
 
         };
+        for(let i=0;i<this.multipliers.length;++i)this.multipliers[i]=1;
         this.timerId=setInterval(()=>this.onTimer(), 1000);
         this.lastUpdate=performance.now();
         this.lastSave=this.lastUpdate;
@@ -50,6 +53,15 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
         }
     }
 
+    updateMultipliers()
+    {
+        if(this.state.upgrades.multAD) {
+            for(let i=1;i<=4;++i) {
+                this.multipliers[i]=2;
+            }
+        }
+    }
+
     load()
     {
         let savedData=localStorage && localStorage.getItem("azincsave");
@@ -62,6 +74,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
                     parsedData.letters=parsedData.letters.slice(0, maxLettersCount);
                 }
                 this.state=parsedData;
+                this.updateMultipliers();
                 this.updateChange(this.state.letters);
             }
         }
@@ -134,11 +147,14 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
             ReactTooltip.rebuild();        
         }
         if(this.tooltip.state.show) {
-            this.tooltip.setState(
-                {
-                    placeholder:this.tooltip.state.currentTarget.getAttribute('data-tip')
-                }
-            );
+            let tgt = this.tooltip.state.currentTarget;
+            let tip = tgt.getAttribute('data-tip');
+            if(tgt.getAttribute('data-multiline')) {
+                tip=tip.split('<br>').map((txt:string,idx:number)=><span className='multi-line' key={idx}>{txt}</span>);
+            }
+            this.tooltip.setState({
+                placeholder:tip
+            });
         }
     }
 
@@ -160,7 +176,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
         }
     }
 
-    onUpgradeClick(idx:number, max:boolean)
+    onUpgradeClick(idx:number, count:number)
     {
         if(idx==this.state.letters.length-1) {
             return;
@@ -175,14 +191,14 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
             if(ucost>newLetters[idx+1].count) {
                 break;
             }
-            if(idx>1 && max && startChange>0 && curChange<=10) {
+            if(idx>1 && count<0 && startChange>0 && curChange<=10) {
                 break;
             }
             newLetters[idx].level++;
             newLetters[idx+1].count-=ucost;
             curChange-=10;
             updated=true;
-        }while(max);
+        }while(count<0 || (--count)!=0);
         if(updated) {
             this.updateChange(newLetters);
             this.setState({letters:newLetters});

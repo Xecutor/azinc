@@ -14,7 +14,7 @@ interface MainGameProps {
     letters : Array<LetterRecord>;
     options: Options;
     onLetterClick: (idx:number)=>void;
-    onUpgradeClick: (idx:number, max:boolean)=>void;
+    onUpgradeClick: (idx:number, count:number)=>void;
     onPauseClick: (idx:number)=>void;
     onAscendClick:()=>void;
 }
