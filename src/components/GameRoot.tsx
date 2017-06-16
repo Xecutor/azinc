@@ -29,20 +29,19 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
     constructor()
     {
         super();
-        this.state={
-            letters:[new LetterRecord], 
-            optionsOpened:false,
-            ascension:false,
-            options:new Options,
-            upgrades:new Upgrades
+        this.state = {
+            letters: [new LetterRecord],
+            optionsOpened: false,
+            ascension: false,
+            options: new Options,
+            upgrades: new Upgrades
 
         };
-        for(let i=0;i<this.multipliers.length;++i)this.multipliers[i]=1;
-        this.timerId=setInterval(()=>this.onTimer(), 1000);
-        this.lastUpdate=performance.now();
-        this.lastSave=this.lastUpdate;
+        this.timerId = setInterval(() => this.onTimer(), 1000);
+        this.lastUpdate = performance.now();
+        this.lastSave = this.lastUpdate;
         this.load();
-        window.onunload=()=>this.save();
+        window.onunload = () => this.save();
     }
 
     save()
@@ -53,11 +52,24 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
         }
     }
 
-    updateMultipliers()
+    updateMultipliers(u:Upgrades)
     {
-        if(this.state.upgrades.multAD) {
-            for(let i=1;i<=4;++i) {
-                this.multipliers[i]=2;
+        const mulRanges:{[key:string]:number[]}={
+            multAE:[1,5],
+            multFJ:[6,10],
+            multKO:[11,15],
+            multPT:[16,20],
+            multUZ:[21,26]
+        }
+        for (let i = 0; i < this.multipliers.length; ++i)this.multipliers[i] = 1;
+        for(let k in u) {
+            if (u[k]) {
+                let r = mulRanges[k];
+                if(r) {
+                    for(let i=r[0];i<=r[1];++i) {
+                        this.multipliers[i]=2;
+                    }
+                }
             }
         }
     }
@@ -74,7 +86,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
                     parsedData.letters=parsedData.letters.slice(0, maxLettersCount);
                 }
                 this.state=parsedData;
-                this.updateMultipliers();
+                this.updateMultipliers(this.state.upgrades);
                 this.updateChange(this.state.letters);
             }
         }
@@ -97,6 +109,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
         if(mul < 1) {
             mul=1;
         }
+        mul*=this.multipliers[idx];
         return [cnt, mul];
     }
 
@@ -167,7 +180,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
         }
         if(idx > 0 && prevCount >= 10) {
             let newLetters=this.state.letters.slice();
-            newLetters[idx].count++;
+            newLetters[idx].count+=this.multipliers[idx];
             if(idx > 1)newLetters[idx-1].count-= 10;
             if(idx == newLetters.length-1 && newLetters[idx].count>=10 && newLetters.length<maxLettersCount) {
                 newLetters.push(new LetterRecord);
@@ -241,6 +254,7 @@ export class GameRoot extends React.Component< undefined, GameRootState > {
     resetState(upgrades:Upgrades)
     {
         this.setState({upgrades:upgrades, ascension:false, letters:[new LetterRecord]});
+        this.updateMultipliers(upgrades);
     }
 
     onHardReset()

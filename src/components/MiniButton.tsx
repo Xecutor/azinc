@@ -12,7 +12,7 @@ interface MiniButtonProps{
 export class MiniButton extends React.Component<MiniButtonProps, undefined> {
     onClick(e:React.MouseEvent<HTMLElement>)
     {
-        e.preventDefault();
+        e.stopPropagation();
         this.props.onClick(e);
     }
     render() 
