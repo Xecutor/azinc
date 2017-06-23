@@ -77,7 +77,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
     updateMultipliers(u: Upgrades) {
         for (let i = 0; i < this.multipliers.length; ++i)this.multipliers[i] = 1;
         for (let k of getKeys(u)) {
-            if (u[k]) {
+            if (u[k] && k.substr(0, 4) == "mult") {
                 let r = upgradeSuffixToRange(k);
                 if (r) {
                     for (let i = r[0]; i <= r[1]; ++i) {
