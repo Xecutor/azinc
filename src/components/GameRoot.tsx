@@ -2,7 +2,8 @@ import * as React from "react";
 import { ModalDialog, ModalContainer } from 'react-modal-dialog';
 import ReactTooltip = require('react-tooltip');
 import { Options, OptionsComponent } from './Options';
-import { AscensionComponent, Upgrades } from './Ascension'
+import { AscensionComponent, Upgrades } from './Ascension';
+import {TranscendComponent} from './Transcend';
 
 import { MainGame, LetterRecord, maxLettersCount } from "./MainGame";
 
@@ -12,6 +13,7 @@ interface GameRootState {
     ascension: boolean;
     options: Options;
     upgrades: Upgrades;
+    stage : number;
 }
 
 function getKeys<T>(obj: T): (keyof T)[] {
@@ -57,7 +59,8 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
             optionsOpened: false,
             ascension: false,
             options: new Options,
-            upgrades: new Upgrades
+            upgrades: new Upgrades,
+            stage : 1
 
         };
         this.timerId = setInterval(() => this.onTimer(), 1000);
@@ -81,7 +84,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
                 let r = upgradeSuffixToRange(k);
                 if (r) {
                     for (let i = r[0]; i <= r[1]; ++i) {
-                        this.multipliers[i] = 2;
+                        this.multipliers[i] = u.globalMult ? 4 : 2;
                     }
                 }
             }
@@ -307,7 +310,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
     }
 
     resetState(upgrades: Upgrades) {
-        this.setState({ upgrades: upgrades, ascension: false, letters: [new LetterRecord] });
+        this.setState({ upgrades: upgrades, ascension: false, stage: 1, letters: [new LetterRecord] });
         this.updateMultipliers(upgrades);
     }
 
@@ -326,7 +329,40 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         this.resetState(newUpgrades);
     }
 
+    onTranscendClick()
+    {
+        this.setState({stage: this.state.stage + 1, ascension: false});
+    }
+
     render() {
+        let mainComponent : JSX.Element;
+
+        if(this.state.stage>1) {
+            mainComponent = <TranscendComponent/>;
+        }
+        else {
+            if(this.state.ascension) {
+                mainComponent = 
+                    <AscensionComponent
+                        upgrades={this.state.upgrades}
+                        onBuyUpgrade={(key: keyof Upgrades) => this.onBuyUpgrade(key)}
+                        onTranscendClick={()=>this.onTranscendClick()}
+                    />;
+            }
+            else {
+                mainComponent = 
+                    <MainGame
+                        letters={this.state.letters}
+                        options={this.state.options}
+                        onLetterClick={(idx) => this.onLetterClick(idx)}
+                        onUpgradeClick={(idx, max) => this.onUpgradeClick(idx, max)}
+                        onPauseClick={(idx) => this.onPauseClick(idx)}
+                        onAscendClick={() => this.onAscendClick()}
+                    />
+
+            }
+        }
+
         return (
             <div>
                 <div className="optionsButton" onClick={() => this.onOptionsClick()}>⚙</div>
@@ -344,24 +380,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
                         </ModalDialog>
                     </ModalContainer>
                 }
-                <div className="container">
-                    {
-                        this.state.ascension ?
-                            <AscensionComponent
-                                upgrades={this.state.upgrades}
-                                onBuyUpgrade={(key: keyof Upgrades) => this.onBuyUpgrade(key)}
-                            />
-                            :
-                            <MainGame
-                                letters={this.state.letters}
-                                options={this.state.options}
-                                onLetterClick={(idx) => this.onLetterClick(idx)}
-                                onUpgradeClick={(idx, max) => this.onUpgradeClick(idx, max)}
-                                onPauseClick={(idx) => this.onPauseClick(idx)}
-                                onAscendClick={() => this.onAscendClick()}
-                            />
-                    }
-                </div>
+                <div className="container">{mainComponent}</div>
                 <ReactTooltip
                     effect={'float'}
                     ref={(tt) => this.tooltip = tt}

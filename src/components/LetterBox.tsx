@@ -32,7 +32,10 @@ export class LetterBox extends React.Component<LetterBoxProps, undefined> {
                 <div className="letterBoxDiv" onClick={() => this.props.onClick(this.props.idx)}>
                     <div className="letterDivInf">{this.props.sym}</div>
                     {
-                        this.props.ascend && <button onClick={this.props.onAscendClick}>Ascend</button>
+                        this.props.ascend &&
+                        <MiniButton borderColor="red" onClick={this.props.onAscendClick}>
+                            <span className="smallText">Ascend</span>
+                        </MiniButton>
                     }
                 </div>
             )

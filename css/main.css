@@ -124,4 +124,23 @@ td {
     display: inline-block;
     margin: 5px;
     cursor: pointer;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.miniButton:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.smallText {
+    font-size: 16px;
+}
+
+.ownedText {
+    background: lightgray;
+}
+
+.centerTd {
+    align-content: center;
+    text-align: center;
 }

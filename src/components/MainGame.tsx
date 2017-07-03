@@ -85,7 +85,7 @@ export class MainGame extends React.Component<MainGameProps, undefined> {
         let rowsCount = maxy - miny + 1;
         let colsCount = maxx - minx + 1;
 
-        let allowAscension = true;//lc>=lettersSeq.length && this.props.letters[lc-1].count>=10;
+        let allowAscension = true || lc >= lettersSeq.length && this.props.letters[lc - 1].count >= 10;
 
         for (let y = 0; y < rowsCount; ++y) {
             let cols = [];
