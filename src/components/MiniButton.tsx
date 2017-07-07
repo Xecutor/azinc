@@ -7,6 +7,7 @@ interface MiniButtonProps {
     normalColor?: string;
     disabledColor?: string;
     borderColor?: string;
+    className?: string;
 }
 
 export class MiniButton extends React.Component<MiniButtonProps, undefined> {
@@ -25,8 +26,13 @@ export class MiniButton extends React.Component<MiniButtonProps, undefined> {
             let bcolor = this.props.borderColor ? this.props.borderColor : 'black';
             style.border = `1px solid ${bcolor}`;
         }
+        let className = "miniButton";
+        if(this.props.className) {
+            //className += " " + this.props.className;
+            className = this.props.className + " miniButton";
+        }
         let buttonProps: any = {
-            className: "miniButton",
+            className: className,
             style: style
         }
         return <div {...buttonProps} onClick={(e) => this.onClick(e)}>{this.props.children}</div>

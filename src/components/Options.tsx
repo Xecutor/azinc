@@ -3,6 +3,7 @@ import * as React from "react";
 type NumberFormat = 'standard' | 'scientific' | 'engineering';
 export class Options {
     numberFormat: NumberFormat = 'standard';
+    showTooltips = true;
 }
 
 const numFormatOptions = [
@@ -30,8 +31,15 @@ export class OptionsComponent extends React.Component<OptionsProps, any> {
     }
 
     onNumFormatChange(event: React.ChangeEvent<HTMLSelectElement>) {
-        let updatedOptions = new Options;
+        let updatedOptions = {...this.props.options};
         updatedOptions.numberFormat = event.target.value as NumberFormat;
+        this.props.onChange(updatedOptions);
+    }
+
+    onTooltipChange(event: React.ChangeEvent<HTMLInputElement>)
+    {
+        let updatedOptions = {...this.props.options};
+        updatedOptions.showTooltips = event.target.checked;
         this.props.onChange(updatedOptions);
     }
 
@@ -46,13 +54,24 @@ export class OptionsComponent extends React.Component<OptionsProps, any> {
     render() {
         return (
             <div>
-                Numbers format:
-                <select value={this.props.options.numberFormat} onChange={(event) => this.onNumFormatChange(event)}>
-                    {
-                        numFormatOptions.map((no) => <option key={no.value} value={no.value}>{no.name}</option>)
-                    }
-                </select>
-                <br />
+                <table>
+                    <tr>
+                        <td className="alignLeft">Numbers format:</td>
+                        <td className="alignLeft">
+                            <select value={this.props.options.numberFormat} onChange={(event) => this.onNumFormatChange(event)}>
+                                {
+                                    numFormatOptions.map((no) => <option key={no.value} value={no.value}>{no.name}</option>)
+                                }
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td className="alignLeft">Show tooltips:</td>
+                        <td className="alignLeft">
+                            <input type="checkbox" checked={this.props.options.showTooltips} onChange={(event)=>this.onTooltipChange(event)}/>
+                        </td>
+                    </tr>
+                </table>
                 <button onClick={() => this.onHardResetClick()} className="hardResetButton">HARD RESET</button>
                 {
                     this.state.showConfirm && (

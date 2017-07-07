@@ -1,7 +1,4 @@
-/*html{
-    min-height: 100%;
-    position:relative;
-}*/
+
 body {
     margin: 0;
     padding: 0;
@@ -101,13 +98,23 @@ td {
     border: 1px solid black;
     border-radius: 3px;
     cursor: pointer;
-    width:40px;
+    /*width:40px;*/
     text-align: center;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
+
+.miniButton {
+    font-size: 22px;
+    display: inline-block;
+    margin: 5px;
+    cursor: pointer;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
 
 .hardResetButton {
     background: red;
@@ -119,14 +126,6 @@ td {
     text-align: left;
 }
 
-.miniButton {
-    font-size: 22px;
-    display: inline-block;
-    margin: 5px;
-    cursor: pointer;
-    padding-left: 5px;
-    padding-right: 5px;
-}
 
 .miniButton:hover {
     background-color: rgba(0, 0, 0, 0.1);
@@ -143,4 +142,9 @@ td {
 .centerTd {
     align-content: center;
     text-align: center;
+}
+
+.alignLeft {
+    align-content: left;
+    text-align: left;
 }

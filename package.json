@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "tsc && concurrently \"tsc -w\" \"lite-server\" ",
-    "build": "webpack"
+    "build": "webpack",
+    "build_release" : "webpack -p --progress --config webpack.release.config.js"
   },
   "keywords": [
     "incremental",
@@ -13,14 +14,17 @@
     "game"
   ],
   "author": "Konstantin 'Xecutor' Stupnik",
-  "repository" : {
-    "type":"git",
+  "repository": {
+    "type": "git",
     "url": "git clone https://github.com/Xecutor/azinc.git"
   },
   "license": "ISC",
   "dependencies": {
     "@types/react": "^15.0.23",
     "@types/react-dom": "^15.5.0",
+    "@types/react-modal-dialog": "file:custom-types/react-modal-dialog",
+    "@types/react-tooltip": "file:custom-types/react-tooltip",
+    "@types/swarm-numberformat": "file:custom-types/swarm-numberformat",
     "decimal.js": "^7.2.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
@@ -28,9 +32,7 @@
     "react-tooltip": "^3.3.0",
     "swarm-numberformat": "^0.3.5",
     "typescript": "^2.3.1",
-    "@types/react-tooltip":"file:custom-types/react-tooltip",
-    "@types/react-modal-dialog":"file:custom-types/react-modal-dialog",
-    "@types/swarm-numberformat":"file:custom-types/swarm-numberformat"
+    "webpack": "^3.1.0"
   },
   "devDependencies": {
     "awesome-typescript-loader": "^3.1.2",

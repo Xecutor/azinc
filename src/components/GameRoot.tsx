@@ -4,6 +4,7 @@ import ReactTooltip = require('react-tooltip');
 import { Options, OptionsComponent } from './Options';
 import { AscensionComponent, Upgrades } from './Ascension';
 import {TranscendComponent} from './Transcend';
+import { MiniButton } from './MiniButton'
 
 import { MainGame, LetterRecord, maxLettersCount } from "./MainGame";
 
@@ -55,11 +56,11 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
     constructor() {
         super();
         this.state = {
-            letters: [new LetterRecord],
+            letters: [new LetterRecord()],
             optionsOpened: false,
             ascension: false,
-            options: new Options,
-            upgrades: new Upgrades,
+            options: new Options(),
+            upgrades: new Upgrades(),
             stage : 1
 
         };
@@ -96,8 +97,8 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         if (savedData) {
             let parsedData = JSON.parse(savedData);
             if (parsedData) {
-                if (!parsedData.options) parsedData.options = new Options;
-                if (!parsedData.upgrades) parsedData.upgrades = new Upgrades;
+                if (!parsedData.options) parsedData.options = new Options();
+                if (!parsedData.upgrades) parsedData.upgrades = new Upgrades();
                 if (parsedData.letters.length > maxLettersCount) {
                     parsedData.letters = parsedData.letters.slice(0, maxLettersCount);
                 }
@@ -159,7 +160,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
                 const upgradeSuffix = indexToUpgradeSuffix(i);
                 const autoUpgradeName = ("autoUpgrade" + upgradeSuffix) as keyof Upgrades;
                 if (this.state.upgrades[autoUpgradeName]) {
-                    if (this.onUpgradeClick(i, -1, newLetters)) {
+                    if (this.onUpgradeClick(i, -1, 10, newLetters)) {
                         updated = true;
                     }
                 }
@@ -215,14 +216,14 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         letters = letters ? letters : this.state.letters.slice();
         let prevCount = idx < 2 ? 10 : letters[idx - 1].count;
         if (this.state.letters.length == 1) {
-            this.setState({ letters: [...letters, new LetterRecord] });
+            this.setState({ letters: [...letters, new LetterRecord()] });
         }
         if (idx > 0 && prevCount >= 10) {
             let newLetters = letters;
             newLetters[idx].count += this.multipliers[idx];
             if (idx > 1) newLetters[idx - 1].count -= 10;
             if (idx == newLetters.length - 1 && newLetters[idx].count >= 10 && newLetters.length < maxLettersCount) {
-                newLetters.push(new LetterRecord);
+                newLetters.push(new LetterRecord());
             }
             if (needSetState) {
                 this.setState({ letters: newLetters });
@@ -230,7 +231,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         }
     }
 
-    onUpgradeClick(idx: number, count: number, letters?: LetterRecord[]) {
+    onUpgradeClick(idx: number, count: number, minChange:number, letters?: LetterRecord[]) {
         const needSetState = letters === undefined;
         letters = letters ? letters : this.state.letters.slice();
         if (idx == letters.length - 1) {
@@ -255,7 +256,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
             if (!cvtUpgrade && ucost > newLetters[idx + 1].count) {
                 break;
             }
-            if (idx > 1 && count < 0 && positiveChangeOnUpgrade && curChange <= 10) {
+            if (idx > 1 && count < 0 && positiveChangeOnUpgrade && curChange <= minChange) {
                 break;
             }
 
@@ -307,16 +308,19 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
 
     onOptionsUpdate(updatedOptions: Options) {
         this.setState({ options: updatedOptions });
+        if (this.state.options.showTooltips != updatedOptions.showTooltips) {
+            ReactTooltip.rebuild();
+        }
     }
 
     resetState(upgrades: Upgrades) {
-        this.setState({ upgrades: upgrades, ascension: false, stage: 1, letters: [new LetterRecord] });
+        this.setState({ upgrades: upgrades, ascension: false, stage: 1, letters: [new LetterRecord()] });
         this.updateMultipliers(upgrades);
     }
 
     onHardReset() {
         this.setState({ optionsOpened: false });
-        this.resetState(new Upgrades);
+        this.resetState(new Upgrades());
     }
 
     onAscendClick() {
@@ -355,7 +359,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
                         letters={this.state.letters}
                         options={this.state.options}
                         onLetterClick={(idx) => this.onLetterClick(idx)}
-                        onUpgradeClick={(idx, max) => this.onUpgradeClick(idx, max)}
+                        onUpgradeClick={(idx, max, min) => this.onUpgradeClick(idx, max, min)}
                         onPauseClick={(idx) => this.onPauseClick(idx)}
                         onAscendClick={() => this.onAscendClick()}
                     />
@@ -365,7 +369,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
 
         return (
             <div>
-                <div className="optionsButton" onClick={() => this.onOptionsClick()}>⚙</div>
+                <MiniButton className="optionsButton" onClick={() => this.onOptionsClick()}>⚙</MiniButton>
                 {
                     this.state.optionsOpened &&
                     <ModalContainer onClose={() => this.onOptionsClose()}>
