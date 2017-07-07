@@ -3,7 +3,7 @@ import { ModalDialog, ModalContainer } from 'react-modal-dialog';
 import ReactTooltip = require('react-tooltip');
 import { Options, OptionsComponent } from './Options';
 import { AscensionComponent, Upgrades } from './Ascension';
-import {TranscendComponent} from './Transcend';
+import { TranscendComponent } from './Transcend';
 import { MiniButton } from './MiniButton'
 
 import { MainGame, LetterRecord, maxLettersCount } from "./MainGame";
@@ -14,7 +14,7 @@ interface GameRootState {
     ascension: boolean;
     options: Options;
     upgrades: Upgrades;
-    stage : number;
+    stage: number;
 }
 
 function getKeys<T>(obj: T): (keyof T)[] {
@@ -61,7 +61,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
             ascension: false,
             options: new Options(),
             upgrades: new Upgrades(),
-            stage : 1
+            stage: 1
 
         };
         this.timerId = setInterval(() => this.onTimer(), 1000);
@@ -231,7 +231,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         }
     }
 
-    onUpgradeClick(idx: number, count: number, minChange:number, letters?: LetterRecord[]) {
+    onUpgradeClick(idx: number, count: number, minChange: number, letters?: LetterRecord[]) {
         const needSetState = letters === undefined;
         letters = letters ? letters : this.state.letters.slice();
         if (idx == letters.length - 1) {
@@ -333,28 +333,27 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         this.resetState(newUpgrades);
     }
 
-    onTranscendClick()
-    {
-        this.setState({stage: this.state.stage + 1, ascension: false});
+    onTranscendClick() {
+        this.setState({ stage: this.state.stage + 1, ascension: false });
     }
 
     render() {
-        let mainComponent : JSX.Element;
+        let mainComponent: JSX.Element;
 
-        if(this.state.stage>1) {
-            mainComponent = <TranscendComponent/>;
+        if (this.state.stage > 1) {
+            mainComponent = <TranscendComponent />;
         }
         else {
-            if(this.state.ascension) {
-                mainComponent = 
+            if (this.state.ascension) {
+                mainComponent =
                     <AscensionComponent
                         upgrades={this.state.upgrades}
                         onBuyUpgrade={(key: keyof Upgrades) => this.onBuyUpgrade(key)}
-                        onTranscendClick={()=>this.onTranscendClick()}
+                        onTranscendClick={() => this.onTranscendClick()}
                     />;
             }
             else {
-                mainComponent = 
+                mainComponent =
                     <MainGame
                         letters={this.state.letters}
                         options={this.state.options}

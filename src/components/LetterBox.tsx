@@ -17,7 +17,7 @@ interface LetterBoxProps {
     options: Options;
 
     onClick: (idx: number) => void;
-    onUpgradeClick: (idx: number, count: number, min:number) => void;
+    onUpgradeClick: (idx: number, count: number, min: number) => void;
     onPauseClick: (idx: number) => void;
     onAscendClick: () => void;
 }
@@ -52,29 +52,29 @@ export class LetterBox extends React.Component<LetterBoxProps, undefined> {
             let countRaw = this.props.letter.count.toString();
             let addStyle = this.props.letter.paused ? " letterBoxDivPaused" : "";
 
-            let ttUpgradeOnce={};
-            let ttUpgradeMax={};
-            let ttCount={}
-            let ttPause={}
-            if(this.props.options.showTooltips) {
+            let ttUpgradeOnce = {};
+            let ttUpgradeMax = {};
+            let ttCount = {}
+            let ttPause = {}
+            if (this.props.options.showTooltips) {
                 ttUpgradeOnce = {
-                    "data-tip":"Increment autoconversion level by 1<br>"+
-                                "Click with shift pressed to increment by 10<br>"+
-                                "Click with alt pressed to increment by 100",
-                    "data-multiline":true
+                    "data-tip": "Increment autoconversion level by 1<br>" +
+                    "Click with shift pressed to increment by 10<br>" +
+                    "Click with alt pressed to increment by 100",
+                    "data-multiline": true
                 }
                 ttUpgradeMax = {
-                    "data-tip":"Increment autoconversion level to maximum, while keeping change rate of previous above certain limit (greater than zero by default)<br>"+
-                               "Click with shift pressed to keep at least 100 of previous tier<br>"+
-                               "Click with alt pressed to keep at least 1000 of previous tier",
-                    "data-multiline":true
+                    "data-tip": "Increment autoconversion level to maximum, while keeping change rate of previous above certain limit (greater than zero by default)<br>" +
+                    "Click with shift pressed to keep at least 100 of previous tier<br>" +
+                    "Click with alt pressed to keep at least 1000 of previous tier",
+                    "data-multiline": true
                 }
                 ttCount = {
-                    "data-tip":countRaw
+                    "data-tip": countRaw
                 }
                 ttPause = {
-                    "data-tip":this.props.letter.paused ? 'Unpause' : 'Pause',
-                    "data-delay-show":2000
+                    "data-tip": this.props.letter.paused ? 'Unpause' : 'Pause',
+                    "data-delay-show": 2000
                 }
             }
 

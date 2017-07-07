@@ -81,9 +81,9 @@ export class AscensionComponent extends React.Component<AscensionProps, any> {
                     </td>
                     <td key={ud.key} className="upgradeDescTd">{ud.desc}</td>
                 </tr>
-        );
+            );
 
-        if(showTranscend) {
+        if (showTranscend) {
             table.push(
                 <tr key="transcend">
                     <td colSpan={2}>
