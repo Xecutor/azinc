@@ -97,16 +97,11 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         if (savedData) {
             let parsedData = JSON.parse(savedData);
             if (parsedData) {
-                if (!parsedData.options) parsedData.options = new Options();
-                if (!parsedData.upgrades) parsedData.upgrades = new Upgrades();
-                if (parsedData.letters.length > maxLettersCount) {
-                    parsedData.letters = parsedData.letters.slice(0, maxLettersCount);
-                }
                 this.state = parsedData;
-                this.updateMultipliers(this.state.upgrades);
-                this.updateChange(this.state.letters);
             }
         }
+        this.updateMultipliers(this.state.upgrades);
+        this.updateChange(this.state.letters);
     }
 
     calcInc(letters: Array<LetterRecord>, idx: number, checkOverflow = true): Array<number> {

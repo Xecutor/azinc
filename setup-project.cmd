@@ -1,3 +1,5 @@
+@echo off
 npm install -g webpack 
-npm install --save react react-dom @types/react @types/react-dom
-npm install --save-dev typescript awesome-typescript-loader source-map-loader
+npm install
+npm run build
+npm run build_release
