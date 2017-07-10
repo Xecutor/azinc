@@ -1,23 +1,36 @@
 
-body {
+.root {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    text-align: center;
+
     margin: 0;
     padding: 0;
+    width: 100%;
     background-color: wheat;
     box-shadow: inset 0px 0px 60px 20px rgba(0,0,0,0.5);
 }
-.root {
-    width: 100%;
-    height: 100vh;
-    position: relative;
+
+.cell, .cell:before {
+    height: 100%;
+}
+.cell:before {
+    content: '';
+    margin-right: -0.25em; /* Adjusts for spacing */
+}
+.cell:before, .container {
+    vertical-align: middle;
+    display: inline-block;
 }
 
 .container {
-    margin: 0;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-right: -50%;
-    transform: translate(-50%, -50%);
+    padding: 0px 12px;
+    text-align: left;
+    max-height: 100%;
+    overflow-y: auto;
 }
 
 td {

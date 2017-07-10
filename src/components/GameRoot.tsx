@@ -362,7 +362,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         }
 
         return (
-            <div>
+            <div className="cell">
                 <MiniButton className="optionsButton" onClick={() => this.onOptionsClick()}>⚙</MiniButton>
                 {
                     this.state.optionsOpened &&
