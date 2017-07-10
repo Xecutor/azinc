@@ -13,7 +13,9 @@ interface MiniButtonProps {
 export class MiniButton extends React.Component<MiniButtonProps, undefined> {
     onClick(e: React.MouseEvent<HTMLElement>) {
         e.stopPropagation();
-        this.props.onClick(e);
+        if(!this.props.disabled) {
+            this.props.onClick(e);
+        }
     }
     render() {
         const dcolor = this.props.disabledColor ? this.props.disabledColor : 'gray';
@@ -27,9 +29,11 @@ export class MiniButton extends React.Component<MiniButtonProps, undefined> {
             style.border = `1px solid ${bcolor}`;
         }
         let className = "miniButton";
+        if (this.props.disabled) {
+            className = "miniButtonDisabled";
+        }
         if(this.props.className) {
-            //className += " " + this.props.className;
-            className = this.props.className + " miniButton";
+            className += " " + this.props.className;
         }
         let buttonProps: any = {
             className: className,

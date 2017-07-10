@@ -8,6 +8,11 @@ import { MiniButton } from './MiniButton'
 
 import { MainGame, LetterRecord, maxLettersCount } from "./MainGame";
 
+export class AltShiftState{
+    shiftDown = false;
+    altDown = false;
+}
+
 interface GameRootState {
     letters: Array<LetterRecord>;
     optionsOpened: boolean;
@@ -15,6 +20,7 @@ interface GameRootState {
     options: Options;
     upgrades: Upgrades;
     stage: number;
+    altShiftState: AltShiftState;
 }
 
 function getKeys<T>(obj: T): (keyof T)[] {
@@ -61,6 +67,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
             ascension: false,
             options: new Options(),
             upgrades: new Upgrades(),
+            altShiftState : new AltShiftState(),
             stage: 1
 
         };
@@ -69,12 +76,25 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         this.lastSave = this.lastUpdate;
         this.load();
         window.onunload = () => this.save();
+        window.document.addEventListener("keydown", (e)=>this.onKeyUpDown(e));
+        window.document.addEventListener("keyup", (e)=>this.onKeyUpDown(e));
     }
 
     save() {
         if (localStorage) {
             let saveData = JSON.stringify(this.state);
             localStorage.setItem("azincsave", saveData);
+        }
+    }
+
+    onKeyUpDown(e:KeyboardEvent)
+    {
+        let newAltShiftState = new AltShiftState();
+        newAltShiftState.altDown = e.altKey;
+        newAltShiftState.shiftDown = e.shiftKey;
+        this.setState({ altShiftState: newAltShiftState });
+        if (e.key == "Alt") {
+            e.preventDefault();
         }
     }
 
@@ -97,6 +117,9 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         if (savedData) {
             let parsedData = JSON.parse(savedData);
             if (parsedData) {
+                if (!parsedData.altShiftState) {
+                    parsedData.altShiftState = new AltShiftState();
+                }
                 this.state = parsedData;
             }
         }
@@ -190,7 +213,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
     }
 
     componentDidUpdate(prevProps: any, prevState: GameRootState) {
-        if (this.state.letters.length != prevState.letters.length) {
+        if (this.state.letters.length != prevState.letters.length || this.state.options.showTooltips != prevState.options.showTooltips) {
             ReactTooltip.rebuild();
         }
         if (this.tooltip.state.show) {
@@ -303,9 +326,6 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
 
     onOptionsUpdate(updatedOptions: Options) {
         this.setState({ options: updatedOptions });
-        if (this.state.options.showTooltips != updatedOptions.showTooltips) {
-            ReactTooltip.rebuild();
-        }
     }
 
     resetState(upgrades: Upgrades) {
@@ -352,6 +372,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
                     <MainGame
                         letters={this.state.letters}
                         options={this.state.options}
+                        altShiftState={this.state.altShiftState}
                         onLetterClick={(idx) => this.onLetterClick(idx)}
                         onUpgradeClick={(idx, max, min) => this.onUpgradeClick(idx, max, min)}
                         onPauseClick={(idx) => this.onPauseClick(idx)}
@@ -360,6 +381,12 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
 
             }
         }
+
+                //  <MiniButton onClick={()=>{
+                //          let newLetters = [...this.state.letters];
+                //          newLetters.push(new LetterRecord());
+                //          this.setState({letters:newLetters});
+                //      }}>up</MiniButton>
 
         return (
             <div className="cell">

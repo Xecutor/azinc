@@ -27,11 +27,14 @@
 }
 
 .container {
-    padding: 0px 12px;
     text-align: left;
-    max-height: 100%;
-    overflow-y: auto;
+    max-height: 100vh;
+    overflow: auto;
 }
+
+_:-moz-tree-row(hover), .container {
+    padding: 2px 0px;
+}   
 
 td {
     text-align: center;
@@ -57,7 +60,7 @@ td {
 .letterDiv {
     font-family: Georgia, 'Times New Roman', Times, serif;
     font-weight: bold;
-    font-size: 34px;
+    font-size: 32px;
 }
 
 .letterDivInf {
@@ -96,10 +99,10 @@ td {
 }
 
 .pauseButton {
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
+    font-size: 14px;
     display: inline-block;
-    cursor: pointer;
 }
 
 .optionsButton {
@@ -123,7 +126,7 @@ td {
 .miniButton {
     font-size: 22px;
     display: inline-block;
-    margin: 5px;
+    margin: 3px;
     cursor: pointer;
     padding-left: 5px;
     padding-right: 5px;
@@ -145,6 +148,16 @@ td {
     background-color: rgba(0, 0, 0, 0.1);
 }
 
+.miniButtonDisabled {
+    background-color: #AAAAAA;
+    font-size: 22px;
+    display: inline-block;
+    margin: 3px;
+    cursor: default;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
 .smallText {
     font-size: 16px;
 }
@@ -161,4 +174,10 @@ td {
 .alignLeft {
     align-content: left;
     text-align: left;
+}
+
+.miniButtonMarginless {
+    margin: 1px;
+    padding-left: 1px;
+    padding-right: 1px;
 }

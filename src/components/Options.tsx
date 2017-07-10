@@ -55,6 +55,7 @@ export class OptionsComponent extends React.Component<OptionsProps, any> {
         return (
             <div>
                 <table>
+                    <tbody>
                     <tr>
                         <td className="alignLeft">Numbers format:</td>
                         <td className="alignLeft">
@@ -71,6 +72,7 @@ export class OptionsComponent extends React.Component<OptionsProps, any> {
                             <input type="checkbox" checked={this.props.options.showTooltips} onChange={(event)=>this.onTooltipChange(event)}/>
                         </td>
                     </tr>
+                    </tbody>
                 </table>
                 <button onClick={() => this.onHardResetClick()} className="hardResetButton">HARD RESET</button>
                 {
