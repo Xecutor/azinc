@@ -78,6 +78,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         window.onunload = () => this.save();
         window.document.addEventListener("keydown", (e)=>this.onKeyUpDown(e));
         window.document.addEventListener("keyup", (e)=>this.onKeyUpDown(e));
+        window.addEventListener("blur", ()=>this.onBlur());
     }
 
     save() {
@@ -96,6 +97,11 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         if (e.key == "Alt") {
             e.preventDefault();
         }
+    }
+
+    onBlur()
+    {
+        this.setState({ altShiftState: new AltShiftState() });
     }
 
     updateMultipliers(u: Upgrades) {

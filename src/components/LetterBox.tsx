@@ -91,9 +91,13 @@ export class LetterBox extends React.Component<LetterBoxProps, undefined> {
                 }
             }
 
+            // <MiniButton borderless={true} onClick={()=>0}><span className="smallText">🔧</span></MiniButton>
+
             return (
                 <div className={"letterBoxDiv" + addStyle} onClick={() => this.props.onClick(this.props.idx)}>
-                    <div className="letterDiv">{this.props.sym}</div>
+                    <div className="letterDiv">
+                        {this.props.sym}
+                    </div>
                     <MiniButton disabled={!this.props.canUpgrade} onClick={(e) => this.onUpgradeClick(e)} borderColor="blue">
                         <span {...ttUpgradeOnce}>⇧</span>
                     </MiniButton>
