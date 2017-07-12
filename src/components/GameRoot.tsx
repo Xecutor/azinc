@@ -78,7 +78,8 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         window.onunload = () => this.save();
         window.document.addEventListener("keydown", (e)=>this.onKeyUpDown(e));
         window.document.addEventListener("keyup", (e)=>this.onKeyUpDown(e));
-        window.addEventListener("blur", ()=>this.onBlur());
+        window.document.addEventListener("blur", ()=>this.onBlurOrFocus());
+        window.document.addEventListener("focus", ()=>this.onBlurOrFocus());
     }
 
     save() {
@@ -99,7 +100,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         }
     }
 
-    onBlur()
+    onBlurOrFocus()
     {
         this.setState({ altShiftState: new AltShiftState() });
     }
