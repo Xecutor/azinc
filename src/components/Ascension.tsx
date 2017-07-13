@@ -38,17 +38,17 @@ const upgradesDesc: Array<{ key: keyof Upgrades, desc: string, isHidden?: boolea
     { key: 'multPT', desc: 'Double conversion rate of letters P-T' },
     { key: 'multUZ', desc: 'Double conversion rate of letters U-Z' },
 
-    { key: 'convPurchaseAE', desc: 'Autoconvert to next tier to pay for upgrade if possible for letters A-E' },
-    { key: 'convPurchaseFJ', desc: 'Autoconvert to next tier to pay for upgrade if possible for letters F-J' },
-    { key: 'convPurchaseKO', desc: 'Autoconvert to next tier to pay for upgrade if possible for letters K-O' },
-    { key: 'convPurchasePT', desc: 'Autoconvert to next tier to pay for upgrade if possible for letters P-T' },
-    { key: 'convPurchaseUZ', desc: 'Autoconvert to next tier to pay for upgrade if possible for letters U-Z' },
+    { key: 'convPurchaseAE', desc: 'Pay for auto converter with current letters x10 if possible for letters A-E' },
+    { key: 'convPurchaseFJ', desc: 'Pay for auto converter with current letters x10 if possible for letters F-J' },
+    { key: 'convPurchaseKO', desc: 'Pay for auto converter with current letters x10 if possible for letters K-O' },
+    { key: 'convPurchasePT', desc: 'Pay for auto converter with current letters x10 if possible for letters P-T' },
+    { key: 'convPurchaseUZ', desc: 'Pay for auto converter with current letters x10 if possible for letters U-Z' },
 
-    { key: 'autoUpgradeAE', desc: 'Increment autoconvertor level automatically when possible for letters A-E' },
-    { key: 'autoUpgradeFJ', desc: 'Increment autoconvertor level automatically when possible for letters F-J' },
-    { key: 'autoUpgradeKO', desc: 'Increment autoconvertor level automatically when possible for letters K-O' },
-    { key: 'autoUpgradePT', desc: 'Increment autoconvertor level automatically when possible for letters P-T' },
-    { key: 'autoUpgradeUZ', desc: 'Increment autoconvertor level automatically when possible for letters U-Z' },
+    { key: 'autoUpgradeAE', desc: 'Buy auto convertor automatically when possible for letters A-E' },
+    { key: 'autoUpgradeFJ', desc: 'Buy auto convertor automatically when possible for letters F-J' },
+    { key: 'autoUpgradeKO', desc: 'Buy auto convertor automatically when possible for letters K-O' },
+    { key: 'autoUpgradePT', desc: 'Buy auto convertor automatically when possible for letters P-T' },
+    { key: 'autoUpgradeUZ', desc: 'Buy auto convertor automatically when possible for letters U-Z' },
 
     { key: 'globalMult', desc: 'Double conversion rate for all letters', isHidden: true },
 ]

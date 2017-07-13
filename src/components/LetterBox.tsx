@@ -5,15 +5,14 @@ import { Options } from './Options';
 import { format } from 'swarm-numberformat';
 import ReactTooltip = require('react-tooltip');
 import { MiniButton } from './MiniButton';
-import {AltShiftState} from './GameRoot'
+import {AltShiftState} from './GameRoot';
+import {LetterOptions} from './LetterOptions';
 
 interface LetterBoxProps {
     sym: string;
     idx: number;
     letter: LetterRecord;
-
-    canUpgrade : boolean;
-    canUpgradeMax : boolean;
+    letterOptions: LetterOptions;
 
     altShiftState: AltShiftState;
 
@@ -25,6 +24,7 @@ interface LetterBoxProps {
     onUpgradeClick: (idx: number, count: number, min: number) => void;
     onPauseClick: (idx: number) => void;
     onAscendClick: () => void;
+    onLetterOptionsClick: (idx:number)=>void;
 }
 
 export class LetterBox extends React.Component<LetterBoxProps, undefined> {
@@ -32,7 +32,7 @@ export class LetterBox extends React.Component<LetterBoxProps, undefined> {
         this.props.onUpgradeClick(this.props.idx, e.altKey ? 100 : e.shiftKey ? 10 : 1, 10);
     }
     onMaxUpgradeClick(e: React.MouseEvent<HTMLElement>) {
-        this.props.onUpgradeClick(this.props.idx, -1, e.altKey ? 1009 : e.shiftKey ? 109 : 10);
+        this.props.onUpgradeClick(this.props.idx, -1, e.altKey ? 1009 : e.shiftKey ? 109 : -1);
     }
     render() {
         if (this.props.idx == 0) {
@@ -51,16 +51,20 @@ export class LetterBox extends React.Component<LetterBoxProps, undefined> {
         else {
             let pauseButtonSym = this.props.letter.paused ? '▶' : '∥';
             let fmt = this.props.options.numberFormat;
-            let lc = format(this.props.letter.change, { format: fmt, flavor: 'short' });
-            let change = this.props.letter.change > 0 ? '+' + lc : lc;
+            let l = this.props.letter;
+            let lc = format(l.change, { format: fmt, flavor: 'short' });
+            let change = l.change > 0 ? '+' + lc : lc;
+            let gen = format(l.generating, { format: fmt, flavor: 'short' });
+            let spend = format(l.spending, { format: fmt, flavor: 'short' });
             let count = format(this.props.letter.count, { format: fmt, flavor: 'short' });
             let countRaw = this.props.letter.count.toString();
             let addStyle = this.props.letter.paused ? " letterBoxDivPaused" : "";
 
             let ttUpgradeOnce = {};
             let ttUpgradeMax = {};
-            let ttCount = {}
-            let ttPause = {}
+            let ttCount = {};
+            let ttPause = {};
+            let ttChange = {};
             if (this.props.options.showTooltips) {
                 let upgradeCost = (this.props.letter.level + 1);
                 if (this.props.altShiftState.shiftDown) {
@@ -70,16 +74,18 @@ export class LetterBox extends React.Component<LetterBoxProps, undefined> {
                     upgradeCost *= 100;
                 }
                 ttUpgradeOnce = {
-                    "data-tip": "Increment auto conversion level by 1<br>" +
-                    "Click with shift pressed to increment by 10<br>" +
-                    "Click with alt pressed to increment by 100<br>" +
-                    `Current upgrade cost: ${upgradeCost==1?upgradeCost : upgradeCost.toString() + ' of'} next letter${upgradeCost>1?'s':''}`,
+                    "data-tip": `Buy 1 auto converter for ${upgradeCost==1?upgradeCost : upgradeCost.toString() + ' of'} next letter${upgradeCost>1?'s':''}<br>` +
+                    "Hold shift and click to buy 10<br>" +
+                    "Hold alt and click to buy 100<br>" +
+                    `Each autoconverter will convert 10 of the previous letter to ${this.props.letter.mult} of this letter each second`,
                     "data-multiline": true
                 }
+                let max = this.props.altShiftState.shiftDown ? 100 : this.props.altShiftState.altDown ? 1000 : this.props.letterOptions.defaultPurchaseToMaxLimit;
                 ttUpgradeMax = {
-                    "data-tip": "Increment auto conversion level to maximum, while keeping change rate of<br>previous letter above certain limit (greater than zero by default)<br>" +
-                    "Click with shift pressed to keep at least 100 of previous tier<br>" +
-                    "Click with alt pressed to keep at least 1000 of previous tier",
+                    "data-tip": `Buy maximum number of autoconverters that you can while keeping previous letter's production above ${max}.<br>` +
+                    "Hold shift and click to keep previous letter production above 100.<br>" +
+                    "Hold alt and click to keep previous letter production above 1000.<br>" +
+                    "If the previous letter's production is below zero the maximum number will be bought regardless of the previous letter's production.",
                     "data-multiline": true
                 }
                 ttCount = {
@@ -89,25 +95,32 @@ export class LetterBox extends React.Component<LetterBoxProps, undefined> {
                     "data-tip": this.props.letter.paused ? 'Unpause' : 'Pause',
                     "data-delay-show": 2000
                 }
+                ttChange = {
+                    "data-tip": `Generating: ${gen}<br>Spending:${spend}<br>Base change rate: ${this.props.letter.baseChange}`,
+                    "data-multiline": true
+                }
             }
 
-            // <MiniButton borderless={true} onClick={()=>0}><span className="smallText">🔧</span></MiniButton>
+            
 
             return (
                 <div className={"letterBoxDiv" + addStyle} onClick={() => this.props.onClick(this.props.idx)}>
+                    <MiniButton className="topRightCorner" borderless={true} onClick={()=>this.props.onLetterOptionsClick(this.props.idx)}>
+                        <span className="smallText">🔧</span>
+                    </MiniButton>
                     <div className="letterDiv">
                         {this.props.sym}
                     </div>
-                    <MiniButton disabled={!this.props.canUpgrade} onClick={(e) => this.onUpgradeClick(e)} borderColor="blue">
+                    <MiniButton disabled={!this.props.letter.canUpgrade} onClick={(e) => this.onUpgradeClick(e)} borderColor="blue">
                         <span {...ttUpgradeOnce}>⇧</span>
                     </MiniButton>
-                    <MiniButton disabled={!this.props.canUpgradeMax} onClick={(e) => this.onMaxUpgradeClick(e)} borderColor="darkgreen">
+                    <MiniButton disabled={!this.props.letter.canUpgradeMax} onClick={(e) => this.onMaxUpgradeClick(e)} borderColor="darkgreen">
                         <span {...ttUpgradeMax}>⇮</span>
                     </MiniButton>
                     {this.props.letter.level}
                     <div className="countDiv">
                         <span {...ttCount}>{count}</span>
-                        ({change})
+                        (<span {...ttChange}>{change}</span>)
                     </div>
                     <div className="centerDiv">
                         <MiniButton className="miniButtonMarginless" borderless={true} onClick={() => this.props.onPauseClick(this.props.idx)}>

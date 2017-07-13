@@ -79,6 +79,7 @@ td {
     height: 100%;
     cursor: default;
     border-radius: 10px;
+    position: relative;
 }
 
 .letterBoxDivPaused {
@@ -139,6 +140,13 @@ td {
     margin-right: 20px;
 }
 
+.softResetButton {
+    background: #FF7777;
+    margin-top: 20px;
+    margin-right: 20px;
+}
+
+
 .upgradeDescTd {
     text-align: left;
 }
@@ -180,4 +188,14 @@ td {
     margin: 1px;
     padding-left: 1px;
     padding-right: 1px;
+}
+
+.topRightCorner {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+.altShiftStateDiv {
+    height: 30px;
 }

@@ -2,24 +2,35 @@ import * as React from "react";
 import { LetterBox } from './LetterBox';
 import { Options } from './Options';
 import { AltShiftState } from './GameRoot';
+import {LetterOptions} from './LetterOptions';
+import {MiniButton} from './MiniButton';
 
 export class LetterRecord {
     count: number = 0;
     level: number = 0;
     paused: boolean = false;
 
+    canUpgrade : boolean = true;
+    canUpgradeMax : boolean = true;
+
+    mult: number = 1;
+    generating : number = 0;
+    spending : number = 0;
     change: number = 0;
     baseChange : number = 0;
 }
 
 interface MainGameProps {
     letters: Array<LetterRecord>;
+    letterOptions: Array<LetterOptions>;
     options: Options;
     altShiftState : AltShiftState;
     onLetterClick: (idx: number) => void;
     onUpgradeClick: (idx: number, count: number, min: number) => void;
     onPauseClick: (idx: number) => void;
     onAscendClick: () => void;
+    onLetterOptionsClick: (idx:number)=>void;
+    onChangeAltShiftState: (altShiftState : AltShiftState)=>void;
 }
 
 const lettersSeq = '∞ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -70,6 +81,18 @@ for (let i = 0; i < lettersSeq.length; ++i) {
 
 export class MainGame extends React.Component<MainGameProps, undefined> {
 
+    onShiftStateClick(){
+        let newAltShiftState = new AltShiftState();
+        newAltShiftState.shiftDown = !this.props.altShiftState.shiftDown;
+        this.props.onChangeAltShiftState(newAltShiftState);
+    }
+
+    onAltStateClick(){
+        let newAltShiftState = new AltShiftState();
+        newAltShiftState.altDown = !this.props.altShiftState.altDown;
+        this.props.onChangeAltShiftState(newAltShiftState);
+    }
+
     render() {
         let rows = [];
 
@@ -88,7 +111,7 @@ export class MainGame extends React.Component<MainGameProps, undefined> {
         let rowsCount = maxy - miny + 1;
         let colsCount = maxx - minx + 1;
 
-        let allowAscension = lc >= lettersSeq.length && this.props.letters[lc - 1].count >= 10;
+        let allowAscension = lc >= maxLettersCount && this.props.letters[lc - 1].count >= 10;
 
         for (let y = 0; y < rowsCount; ++y) {
             let cols = [];
@@ -100,30 +123,39 @@ export class MainGame extends React.Component<MainGameProps, undefined> {
                     let prvLet = this.props.letters[lInfo.idx - 1];
                     let curLet = this.props.letters[lInfo.idx];
                     let nxtLet = this.props.letters[lInfo.idx + 1];
-                    let mul = this.props.altShiftState.shiftDown ? 10 : this.props.altShiftState.altDown ? 100 : 1;
-                    let canUpgrade = nxtLet && mul*(curLet.level + 1) <= nxtLet.count;
-                    let max = this.props.altShiftState.shiftDown ? 109 : this.props.altShiftState.altDown ? 1009 : 10;
-                    let canUpgradeMax = nxtLet && curLet.level + 1 <= nxtLet.count && ((prvLet && prvLet.change > max) || lInfo.idx==1 );
+                    let lo = this.props.letterOptions[lInfo.idx];
                     cols.push(
                         <td key={x + ' ' + y} className="letterTd">
                             <LetterBox
                                 sym={sym}
                                 idx={lInfo.idx}
                                 letter={curLet}
+                                letterOptions={lo}
                                 options={this.props.options}
                                 ascend={allowAscension}
-                                canUpgrade={canUpgrade}
-                                canUpgradeMax={canUpgradeMax}
                                 altShiftState={this.props.altShiftState}
                                 onClick={this.props.onLetterClick}
                                 onUpgradeClick={this.props.onUpgradeClick}
                                 onPauseClick={this.props.onPauseClick}
                                 onAscendClick={this.props.onAscendClick}
+                                onLetterOptionsClick={this.props.onLetterOptionsClick}
                             />
                         </td>);
                 }
                 else {
+                    if (this.props.options.showAltShiftIndicator && minx + x == 3 && miny + y == 2) {
+                        cols.push(<td key={x + ' ' + y}>
+                            <div className="altShiftStateDiv">
+                                <MiniButton borderless={!this.props.altShiftState.shiftDown} onClick={() => this.onShiftStateClick()}>Shift</MiniButton>
+                            </div>
+                            <div className="altShiftStateDiv">
+                                <MiniButton borderless={!this.props.altShiftState.altDown} onClick={() => this.onAltStateClick()}>Alt</MiniButton>
+                            </div>
+                        </td>);
+                    }
+                    else {
                     cols.push(<td key={x + ' ' + y}></td>);
+                    }
                 }
                 if (x != colsCount - 1) {
                     let nxlInfo = lettersArr[miny + y][minx + x + 1];
