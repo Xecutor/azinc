@@ -34,7 +34,7 @@ const upgradesDesc: Array<{ key: keyof Upgrades, desc: string, isHidden?: boolea
 
     { key: 'multAE', desc: 'Double conversion rate of letters A-E' },
     { key: 'multFJ', desc: 'Double conversion rate of letters F-J' },
-    { key: 'multKO', desc: 'Double conversion rate of letters L-O' },
+    { key: 'multKO', desc: 'Double conversion rate of letters K-O' },
     { key: 'multPT', desc: 'Double conversion rate of letters P-T' },
     { key: 'multUZ', desc: 'Double conversion rate of letters U-Z' },
 
