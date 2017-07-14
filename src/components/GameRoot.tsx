@@ -5,17 +5,20 @@ import { Options, OptionsComponent } from './Options';
 import { AscensionComponent, Upgrades } from './Ascension';
 import { TranscendComponent } from './Transcend';
 import { MiniButton } from './MiniButton'
-
+import { LetterOptions, LetterOptionsComponent } from './LetterOptions';
 import { MainGame, LetterRecord, maxLettersCount } from "./MainGame";
 
-export class AltShiftState{
+export class AltShiftState {
     shiftDown = false;
     altDown = false;
 }
 
 interface GameRootState {
     letters: Array<LetterRecord>;
+    letterOptions: Array<LetterOptions>;
     optionsOpened: boolean;
+    letterOptionsOpened: boolean;
+    letterOptionsIdx: number;
     ascension: boolean;
     options: Options;
     upgrades: Upgrades;
@@ -49,6 +52,14 @@ function indexToUpgradeSuffix(idx: number) {
     return upgradeSuffixes[Math.floor((idx - 1) / 5)];
 }
 
+function createArray<T>(size: number, className: { new (): T }): Array<T> {
+    let rv = new Array<T>(size);
+    for (let i = 0; i < size; ++i) {
+        rv[i] = new className();
+    }
+    return rv;
+}
+
 export class GameRoot extends React.Component<undefined, GameRootState> {
 
     timerId: number;
@@ -63,11 +74,14 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         super();
         this.state = {
             letters: [new LetterRecord()],
+            letterOptions: createArray(maxLettersCount, LetterOptions),
+            letterOptionsOpened: false,
+            letterOptionsIdx: 0,
             optionsOpened: false,
             ascension: false,
             options: new Options(),
             upgrades: new Upgrades(),
-            altShiftState : new AltShiftState(),
+            altShiftState: new AltShiftState(),
             stage: 1
 
         };
@@ -76,10 +90,10 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         this.lastSave = this.lastUpdate;
         this.load();
         window.onunload = () => this.save();
-        window.document.addEventListener("keydown", (e)=>this.onKeyUpDown(e));
-        window.document.addEventListener("keyup", (e)=>this.onKeyUpDown(e));
-        window.document.addEventListener("blur", ()=>this.onBlurOrFocus());
-        window.document.addEventListener("focus", ()=>this.onBlurOrFocus());
+        window.document.addEventListener("keydown", (e) => this.onKeyUpDown(e));
+        window.document.addEventListener("keyup", (e) => this.onKeyUpDown(e));
+        window.addEventListener("blur", () => this.onBlurOrFocus());
+        window.addEventListener("focus", () => this.onBlurOrFocus());
     }
 
     save() {
@@ -89,20 +103,18 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         }
     }
 
-    onKeyUpDown(e:KeyboardEvent)
-    {
+    onKeyUpDown(e: KeyboardEvent) {
         let newAltShiftState = new AltShiftState();
         newAltShiftState.altDown = e.altKey;
         newAltShiftState.shiftDown = e.shiftKey;
-        this.setState({ altShiftState: newAltShiftState });
+        this.onChangeAltShiftState(newAltShiftState);
         if (e.key == "Alt") {
             e.preventDefault();
         }
     }
 
-    onBlurOrFocus()
-    {
-        this.setState({ altShiftState: new AltShiftState() });
+    onBlurOrFocus() {
+        this.onChangeAltShiftState(new AltShiftState());
     }
 
     updateMultipliers(u: Upgrades) {
@@ -127,16 +139,32 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
                 if (!parsedData.altShiftState) {
                     parsedData.altShiftState = new AltShiftState();
                 }
+                if (!parsedData.letterOptions) {
+                    parsedData.letterOptions = createArray(maxLettersCount, LetterOptions);
+                }
                 this.state = parsedData;
             }
         }
+        this.updateLetterOptions(this.state.letterOptions, this.state.upgrades);
         this.updateMultipliers(this.state.upgrades);
         this.updateChange(this.state.letters);
     }
 
-    calcInc(letters: Array<LetterRecord>, idx: number, checkOverflow = true): Array<number> {
+    updateLetterOptions(letterOptions: Array<LetterOptions>, upgrades: Upgrades) {
+        for (let i = 0; i < upgradeSuffixes.length; ++i) {
+            let range = suffixRanges[upgradeSuffixes[i]];
+            let upgradeName = ('autoUpgrade' + upgradeSuffixes[i]) as keyof Upgrades;
+            if (upgrades[upgradeName]) {
+                for (let j = range[0]; j <= range[1]; ++j) {
+                    letterOptions[j].haveAutoUpgrade = true;
+                }
+            }
+        }
+    }
+
+    calcInc(letters: Array<LetterRecord>, idx: number, checkOverflow: boolean, ignorePause: boolean): Array<number> {
         let l = letters[idx];
-        if (!l || l.paused) return [0, 0];
+        if (!l || (l.paused && !ignorePause)) return [0, 0];
         let lp = letters[idx - 1];
         let cnt = Math.abs((lp.count / 10));
         if (!checkOverflow || idx == 1 || cnt > l.level) cnt = l.level;
@@ -154,11 +182,38 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         return [cnt, mul];
     }
 
-    updateChange(newLetters: Array<LetterRecord>) {
+    updateChange(newLetters: Array<LetterRecord>, altShiftState?: AltShiftState) {
+        if (!altShiftState) {
+            altShiftState = this.state.altShiftState;
+        }
         for (let i = 1; i < newLetters.length; ++i) {
-            let [cnt, mul] = this.calcInc(newLetters, i, false);
-            let [cnt2] = this.calcInc(newLetters, i + 1, false);
-            newLetters[i].change = cnt * mul - cnt2 * 10;
+            let [cnt, mult] = this.calcInc(newLetters, i, false, false);
+            let [cnt2] = this.calcInc(newLetters, i + 1, false, false);
+            let [cnt2base] = this.calcInc(newLetters, i + 1, false, true);
+
+            let prvLet = newLetters[i - 1];
+            let curLet = newLetters[i];
+            let nxtLet = newLetters[i + 1];
+
+            curLet.mult = mult;
+            curLet.generating = cnt * mult;
+            curLet.spending = cnt2 * 10;
+            curLet.change = curLet.generating - curLet.spending;
+            curLet.baseChange = cnt * mult - cnt2base * 10;
+
+            const upgradeSiffix = indexToUpgradeSuffix(i);
+            const convUpgradeName = ('convPurchase' + upgradeSiffix) as keyof Upgrades;
+
+            let lo = this.state.letterOptions[i];
+            let mul = altShiftState.shiftDown ? 10 : altShiftState.altDown ? 100 : lo.defaultPurchaseAmount;
+            curLet.canUpgrade = nxtLet && mul * (curLet.level + 1) <= nxtLet.count;
+            let canConvUpgrade = this.state.upgrades[convUpgradeName] && (curLet.level + 1) * 10 <= curLet.count;
+            if (canConvUpgrade) {
+                curLet.canUpgrade = true;
+            }
+            let max = altShiftState.shiftDown ? 109 : altShiftState.altDown ? 1009 : (lo.defaultPurchaseToMaxLimit + 9);
+            curLet.canUpgradeMax = ((nxtLet && curLet.level + 1 <= nxtLet.count) || canConvUpgrade) &&
+                ((prvLet && (prvLet.change > max || prvLet.change < 0)) || i == 1);
         }
     }
 
@@ -180,12 +235,12 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         let now = performance.now();
         let newLetters = this.state.letters.slice();
         let updated = false;
-        while (now - this.lastUpdate >= 1000) {
+        while (now - this.lastUpdate > 950) {
             for (let i = 1; i < newLetters.length; ++i) {
                 const upgradeSuffix = indexToUpgradeSuffix(i);
                 const autoUpgradeName = ("autoUpgrade" + upgradeSuffix) as keyof Upgrades;
-                if (this.state.upgrades[autoUpgradeName]) {
-                    if (this.onUpgradeClick(i, -1, 10, newLetters)) {
+                if (this.state.upgrades[autoUpgradeName] && this.state.letterOptions[i].enableAutoUpgrade) {
+                    if (this.onUpgradeClick(i, -1, -1, newLetters)) {
                         updated = true;
                     }
                 }
@@ -195,7 +250,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
                     continue;
                 }
                 if (i == 1 || lp.count >= 10) {
-                    let [cnt, mul] = this.calcInc(newLetters, i)
+                    let [cnt, mul] = this.calcInc(newLetters, i, true, false)
                     l.count += (cnt * mul);
                     lp.count -= cnt * 10;
                     l.count = Math.round(l.count);
@@ -251,6 +306,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
                 newLetters.push(new LetterRecord());
             }
             if (needSetState) {
+                this.updateChange(newLetters, this.state.altShiftState);
                 this.setState({ letters: newLetters });
             }
         }
@@ -262,9 +318,15 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         if (idx == letters.length - 1) {
             return;
         }
+        if (count == 1) {
+            count = this.state.letterOptions[idx].defaultPurchaseAmount;
+        }
+        if (minChange == -1) {
+            minChange = this.state.letterOptions[idx].defaultPurchaseToMaxLimit + 9;
+        }
         let newLetters = letters;
         let updated = false;
-        let curChange = newLetters[idx - 1].change;
+        let curChange = newLetters[idx - 1].baseChange;
         let positiveChangeOnUpgrade = curChange >= 0;
         if (!needSetState) {
             positiveChangeOnUpgrade = true;
@@ -273,7 +335,7 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         const convUpgradeName = ('convPurchase' + upgradeSiffix) as keyof Upgrades;
         const autoUpgradeName = ('autoUpgrade' + upgradeSiffix) as keyof Upgrades;
         const haveConvUpgrade = this.state.upgrades[convUpgradeName];
-        const haveAutoUpgrade = this.state.upgrades[autoUpgradeName];
+        const haveAutoUpgrade = this.state.upgrades[autoUpgradeName] && this.state.letterOptions[idx].enableAutoUpgrade;
         do {
 
             let ucost = newLetters[idx].level + 1;
@@ -336,7 +398,15 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
     }
 
     resetState(upgrades: Upgrades) {
-        this.setState({ upgrades: upgrades, ascension: false, stage: 1, letters: [new LetterRecord()] });
+        let letterOptions = createArray(maxLettersCount, LetterOptions);
+        this.updateLetterOptions(letterOptions, upgrades);
+        this.setState({
+            upgrades: upgrades,
+            letterOptions: letterOptions,
+            ascension: false,
+            stage: 1,
+            letters: [new LetterRecord()]
+        });
         this.updateMultipliers(upgrades);
     }
 
@@ -344,6 +414,12 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
         this.setState({ optionsOpened: false });
         this.resetState(new Upgrades());
     }
+
+    onSoftReset() {
+        this.setState({ optionsOpened: false });
+        this.resetState({ ...this.state.upgrades });
+    }
+
 
     onAscendClick() {
         this.setState({ ascension: true });
@@ -357,6 +433,26 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
 
     onTranscendClick() {
         this.setState({ stage: this.state.stage + 1, ascension: false });
+    }
+
+    onLetterOptionsClick(idx: number) {
+        this.setState({ letterOptionsOpened: true, letterOptionsIdx: idx });
+    }
+
+    onLetterOptionsClose() {
+        this.setState({ letterOptionsOpened: false });
+    }
+
+    onLetterOptionsUpdate(idx: number, newOptions: LetterOptions) {
+        let optionsArray = [...this.state.letterOptions];
+        optionsArray[idx] = newOptions;
+        this.setState({ letterOptions: optionsArray });
+    }
+
+    onChangeAltShiftState(newAltShiftState:AltShiftState) {
+        let newLetters = [...this.state.letters];
+        this.updateChange(newLetters, newAltShiftState);
+        this.setState({altShiftState: newAltShiftState, letters:newLetters});
     }
 
     render() {
@@ -378,40 +474,55 @@ export class GameRoot extends React.Component<undefined, GameRootState> {
                 mainComponent =
                     <MainGame
                         letters={this.state.letters}
+                        letterOptions={this.state.letterOptions}
                         options={this.state.options}
                         altShiftState={this.state.altShiftState}
                         onLetterClick={(idx) => this.onLetterClick(idx)}
                         onUpgradeClick={(idx, max, min) => this.onUpgradeClick(idx, max, min)}
                         onPauseClick={(idx) => this.onPauseClick(idx)}
                         onAscendClick={() => this.onAscendClick()}
+                        onLetterOptionsClick={(idx) => this.onLetterOptionsClick(idx)}
+                        onChangeAltShiftState={(newAltShiftState)=>this.onChangeAltShiftState(newAltShiftState)}
                     />
 
             }
         }
 
-                //  <MiniButton onClick={()=>{
-                //          let newLetters = [...this.state.letters];
-                //          newLetters.push(new LetterRecord());
-                //          this.setState({letters:newLetters});
-                //      }}>up</MiniButton>
+        let optionsDlg = this.state.optionsOpened &&
+            <ModalContainer onClose={() => this.onOptionsClose()}>
+                <ModalDialog onClose={() => this.onOptionsClose()}>
+                    <div ref={(d) => this.updateOptionsDiv(d)}>
+                        <OptionsComponent
+                            options={this.state.options}
+                            onChange={(updatedOptions: Options) => this.onOptionsUpdate(updatedOptions)}
+                            onHardReset={() => this.onHardReset()}
+                            onSoftReset={() => this.onSoftReset()}
+                        />
+                    </div>
+                </ModalDialog>
+            </ModalContainer>;
+        let letterOptionsDlg = this.state.letterOptionsOpened &&
+            <ModalContainer onClose={() => this.onLetterOptionsClose()}>
+                <ModalDialog onClose={() => this.onLetterOptionsClose()}>
+                    <LetterOptionsComponent
+                        idx={this.state.letterOptionsIdx}
+                        onOptionsChanged={(idx: number, newOptions: LetterOptions) => this.onLetterOptionsUpdate(idx, newOptions)}
+                        options={this.state.letterOptions[this.state.letterOptionsIdx]}
+                    />
+                </ModalDialog>
+            </ModalContainer>
+
+        //  <MiniButton onClick={()=>{
+        //          let newLetters = [...this.state.letters];
+        //          newLetters.push(new LetterRecord());
+        //          this.setState({letters:newLetters});
+        //      }}>up</MiniButton>
 
         return (
             <div className="cell">
                 <MiniButton className="optionsButton" onClick={() => this.onOptionsClick()}>⚙</MiniButton>
-                {
-                    this.state.optionsOpened &&
-                    <ModalContainer onClose={() => this.onOptionsClose()}>
-                        <ModalDialog onClose={() => this.onOptionsClose()}>
-                            <div ref={(d) => this.updateOptionsDiv(d)}>
-                                <OptionsComponent
-                                    options={this.state.options}
-                                    onChange={(updatedOptions: Options) => this.onOptionsUpdate(updatedOptions)}
-                                    onHardReset={() => this.onHardReset()}
-                                />
-                            </div>
-                        </ModalDialog>
-                    </ModalContainer>
-                }
+                {optionsDlg}
+                {letterOptionsDlg}
                 <div className="container">{mainComponent}</div>
                 <ReactTooltip
                     effect={'float'}
