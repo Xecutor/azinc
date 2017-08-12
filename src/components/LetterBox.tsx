@@ -66,15 +66,17 @@ export class LetterBox extends React.Component<LetterBoxProps, undefined> {
             let ttPause = {};
             let ttChange = {};
             if (this.props.options.showTooltips) {
-                let upgradeCost = (this.props.letter.level + 1);
+                let upgradeAmount = 1;
                 if (this.props.altShiftState.shiftDown) {
-                    upgradeCost *= 10;
+                    upgradeAmount = 10;
                 }
                 else if (this.props.altShiftState.altDown) {
-                    upgradeCost *= 100;
+                    upgradeAmount = 100;
                 }
+                let upgradeCost = (this.props.letter.level * upgradeAmount);
+                upgradeCost += ((upgradeAmount * (upgradeAmount + 1)) / 2);
                 ttUpgradeOnce = {
-                    "data-tip": `Buy 1 auto converter for ${upgradeCost==1?upgradeCost : upgradeCost.toString() + ' of'} next letter${upgradeCost>1?'s':''}<br>` +
+                    "data-tip": `Buy ${upgradeAmount} autoconverter${upgradeAmount>1?'s':''} for ${upgradeCost==1?upgradeCost : upgradeCost.toString() + ' of'} next letter${upgradeCost>1?'s':''}<br>` +
                     "Hold shift and click to buy 10<br>" +
                     "Hold alt and click to buy 100<br>" +
                     `Each autoconverter will convert 10 of the previous letter to ${this.props.letter.mult} of this letter each second`,
